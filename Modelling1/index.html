@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelling 1</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        #chart-container {
+            width: 50%;
+        }
+
+        #all_sliders {
+            display: flex;
+            flex-direction: column;
+            margin-top: 5%;
+        }
+
+        .slider-container {
+            width: 50%;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div id="chart-container"></div>
+</div>
+
+<script>
+    function debounce(func, timeout = 300) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                func.apply(this, args);
+            }, timeout);
+        };
+    }
+
+    function DrawChart(elements) {
+        let data = [
+            {
+                x: elements[0],
+                y: elements[1],
+                z: elements[2],
+                type: 'scatter3d',
+                mode: 'lines',
+                line: {
+                    width: 5
+                }
+            }
+        ];
+
+        let layout = {
+            margin: {
+                l: 0,
+                r: 0,
+                b: 0,
+                t: 0
+            },
+        };
+
+        Plotly.newPlot('chart-container', data, layout);
+    }
+
+
+    function GenerateData(params) {
+        let Positions = [[0], [0], [0]];
+        let [vx, vy, vz] = [params.Vx, params.Vy, params.Vz].map((item) => Number(item));
+        let ax = (q, m, B, Vy) => {
+            return q * Vy * B / m;
+        }
+
+        let ay = (q, m, B, Vx) => {
+            return -q * Vx * B / m;
+        }
+
+        let dt = 0.005;
+        for (let i = 0; i < params.n; i += 1) {
+            let [x, y, z] = [Positions[0][i], Positions[1][i], Positions[2][i]];
+
+            Positions[0].push(x + vx * dt);
+            Positions[1].push(y + vy * dt);
+            Positions[2].push(z + vz * dt);
+
+            let vx_copy = vx;
+            let vy_copy = vy;
+            vx += ax(params.q, params.m, params.Bz, vy_copy) * dt;
+            vy += ay(params.q, params.m, params.Bz, vx_copy) * dt;
+            vz += 0;
+        }
+
+        return [Positions[0], Positions[1], Positions[2]]
+    }
+
+    function TemplateSlider(name, min, max, value, step = 1) {
+        return `
+                <div class="slider-container">
+                    <label for="paramSlider">Параметр ${name}:</label>
+                    <input type="range" name="${name}" min="${min}" max="${max}" value="${value}" class="slider" step="${step}">
+                    <p>Значение: <span id="param_${name}">${value}</span></p>
+                </div>
+                `;
+    }
+
+    function ChangeHTML(name, value) {
+        document.getElementById(`param_${name}`).innerHTML = value;
+    }
+
+    const data = [
+        {name: "Vx", min: -100, max: 100, value: 20, step: 1},
+        {name: "Vy", min: -100, max: 100, value: 20, step: 1},
+        {name: "Vz", min: -100, max: 100, value: 10, step: 1},
+        {name: "B", min: -10, max: 10, value: 1, step: 0.1},
+        {name: "q", min: -10, max: 10, value: 1, step: 0.1},
+        {name: "m", min: 0.1, max: 10, value: 0.1, step: 0.1},
+        {name: "n", min: 0, max: 10000, value: 2000, step: 100},
+    ]
+    const generateSliders = (data) => {
+        let sliders = '<div id="all_sliders">';
+        data.forEach((item) => {
+            sliders += TemplateSlider(item.name, item.min, item.max, item.value, item.step);
+        });
+        return sliders + '</div>';
+    }
+
+    document.body.querySelector('.wrapper').innerHTML = generateSliders(data) + document.body.querySelector('.wrapper').innerHTML;
+    DrawChart(GenerateData({
+        Vx: document.querySelector('input[name="Vx"]').value,
+        Vy: document.querySelector('input[name="Vy"]').value,
+        Vz: document.querySelector('input[name="Vz"]').value,
+        Bz: document.querySelector('input[name="B"]').value,
+        q: document.querySelector('input[name="q"]').value,
+        m: document.querySelector('input[name="m"]').value,
+        n: document.querySelector('input[name="n"]').value,
+    }));
+
+    let sliders = document.querySelectorAll('.slider');
+
+    const debounceDrawChart = debounce(DrawChart, 500);
+    sliders.forEach((slider) => {
+        slider.addEventListener('input', (event) => {
+            ChangeHTML(event.target.name, event.target.value);
+
+            debounceDrawChart(GenerateData({
+                Vx: document.querySelector('input[name="Vx"]').value,
+                Vy: document.querySelector('input[name="Vy"]').value,
+                Vz: document.querySelector('input[name="Vz"]').value,
+                Bz: document.querySelector('input[name="B"]').value,
+                q: document.querySelector('input[name="q"]').value,
+                m: document.querySelector('input[name="m"]').value,
+                n: document.querySelector('input[name="n"]').value,
+            }));
+
+        });
+    });
+
+
+</script>
+
+
+</body>
+</html>
