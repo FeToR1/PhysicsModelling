@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelling 2</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        #chart-container {
+            width: 70%;
+        }
+
+        #all_sliders {
+            display: flex;
+            flex-direction: column;
+            margin-top: 5%;
+        }
+
+        .slider-container {
+            width: 30%;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div id="chart-container"></div>
+</div>
+
+<script type="module">
+    import {generateSliders, ChangeHTML} from "./Sliders.js"
+    import {debounce, getValues} from "./Utils.js"
+    import {GenerateData, DrawChart} from "./DataGenerator.js"
+
+
+    const data = [
+        {name: "R", unit: "м", min: 1, max: 100, value: 20, step: 1},
+        {name: "N", unit: "", min: 0, max: 100, value: 20, step: 1},
+        {name: "I", unit: "А", min: -100, max: 100, value: 10, step: 1},
+    ]
+
+    document.body.querySelector('.wrapper').innerHTML = generateSliders(data) + document.body.querySelector('.wrapper').innerHTML;
+    DrawChart(GenerateData(getValues(data)));
+
+    let sliders = document.querySelectorAll('.slider');
+
+    const debounceDrawChart = debounce(DrawChart, 500);
+
+    sliders.forEach((slider) => {
+        slider.addEventListener('input', (event) => {
+            ChangeHTML(event.target.name, event.target.value);
+            debounceDrawChart(GenerateData(getValues(data)));
+        });
+    });
+
+
+</script>
+
+
+</body>
+</html>
