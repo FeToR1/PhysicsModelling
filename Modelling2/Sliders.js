@@ -3,7 +3,7 @@ function TemplateSlider(item) {
                 <div class="slider-container">
                     <label for="paramSlider">Параметр ${item.name}:</label>
                     <input type="range" name="${item.name}" min="${item.min}" max="${item.max}" value="${item.value}" class="slider" step="${item.step}">
-                    <p>Значение: <span id="param_${item.name}">${item.value}</span> ${item.unit} </p>
+                    <p>Значение: <span id="param_${item.name}">${item.value}</span> ${item.unit}</p>
                 </div>
                 `;
 }
