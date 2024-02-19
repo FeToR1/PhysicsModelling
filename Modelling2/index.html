@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelling 2</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        #chart-container {
+            width: 60%;
+        }
+
+        #all_sliders {
+            display: flex;
+            flex-direction: column;
+            margin-top: 5%;
+        }
+
+        .slider-container {
+            width: 40%;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div id="chart-container"></div>
+</div>
+
+<script type="module">
+    import {generateSliders, ChangeHTML} from "./Sliders.js"
+    import {debounce, getValues} from "./Utils.js"
+    import {GenerateData} from "./DataGenerator.js"
+
+    function DrawChart(elements) {
+        let data = [
+            {
+                x: elements[0],
+                y: elements[1],
+                type: 'scatter',
+                mode: 'lines',
+                line: {
+                    width: 5
+                }
+            }
+        ];
+
+        let layout = {
+            annotations: [{
+                xref: 'paper',
+                yref: 'paper',
+                x: 0,
+                xanchor: 'right',
+                y: 1,
+                yanchor: 'bottom',
+                text: 'B(x), Тл',
+                showarrow: false
+            }, {
+                xref: 'paper',
+                yref: 'paper',
+                x: 1,
+                xanchor: 'left',
+                y: 0,
+                yanchor: 'top',
+                text: 'x, м',
+                showarrow: false
+            }]
+        };
+
+        Plotly.newPlot('chart-container', data, layout);
+    }
+
+
+    const data = [
+        {name: "R", unit: "м", min: 1, max: 100, value: 20, step: 1},
+        {name: "N", unit: "", min: 0, max: 100, value: 20, step: 1},
+        {name: "I", unit: "А", min: -100, max: 100, value: 10, step: 1},
+    ]
+
+    document.body.querySelector('.wrapper').innerHTML = generateSliders(data) + document.body.querySelector('.wrapper').innerHTML;
+    DrawChart(GenerateData(getValues(data)));
+
+    let sliders = document.querySelectorAll('.slider');
+
+    const debounceDrawChart = debounce(DrawChart, 500);
+
+    sliders.forEach((slider) => {
+        slider.addEventListener('input', (event) => {
+            ChangeHTML(event.target.name, event.target.value);
+            debounceDrawChart(GenerateData(getValues(data)));
+        });
+    });
+
+
+</script>
+
+
+</body>
+</html>
