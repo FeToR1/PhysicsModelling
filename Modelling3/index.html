@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelling 3</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js'></script>
+    <style>
+        #chart-container {
+            width: 100%;
+        }
+
+        #all_sliders {
+            display: flex;
+            flex-direction: column;
+            margin-top: 5%;
+
+        }
+
+        .slider-container {
+            width: 30%;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div id="chart-container"></div>
+</div>
+
+<script type="module">
+    import {generateSliders, ChangeHTML} from "./Sliders.js"
+    import {debounce, getValues} from "./Utils.js"
+    import {DrawChart} from "./DataGenerator.js"
+
+
+    let count = 5;
+
+    const data = [];
+    for (let i = 0; i < count; i++) {
+        data.push({name: `I${i}`, unit: "А", min: -100, max: 100, value: 0, step: 1});
+        // data.push({name: `pos_x_I${i}`, unit: "м", min: -100, max: 100, value: i * 10, step: 1});
+        data.push({name: `pos_x_I${i}`, unit: "м", min: -100, max: 100, value: 0, step: 1});
+        data.push({name: `pos_y_I${i}`, unit: "м", min: -100, max: 100, value: 0, step: 1});
+    }
+
+    document.body.querySelector('.wrapper').innerHTML = generateSliders(data) + document.body.querySelector('.wrapper').innerHTML;
+    DrawChart(getValues(data));
+
+    let sliders = document.querySelectorAll('.slider');
+
+    const debounceDrawChart = debounce(DrawChart, 500);
+
+    sliders.forEach((slider) => {
+        slider.addEventListener('input', (event) => {
+            ChangeHTML(event.target.name, event.target.value);
+            debounceDrawChart(getValues(data));
+        });
+    });
+
+
+</script>
+
+
+</body>
+</html>
