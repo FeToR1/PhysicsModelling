@@ -53,7 +53,7 @@
                 mode: 'lines',
                 line: {
                     width: 5
-                }
+                },
             }
         ];
 
@@ -71,7 +71,7 @@
 
 
     function GenerateData(params) {
-        let Positions = [[0], [0], [0]];
+        let Positions = [[], [], []];
         let [vx, vy, vz] = [params.Vx, params.Vy, params.Vz].map((item) => Number(item));
         let ax = (q, m, B, Vy) => {
             return q * Vy * B / m;
@@ -81,19 +81,18 @@
             return -q * Vx * B / m;
         }
 
-        let dt = 0.005;
-        for (let i = 0; i < params.n; i += 1) {
-            let [x, y, z] = [Positions[0][i], Positions[1][i], Positions[2][i]];
+        let [Ax, Ay] = [ax(params.q, params.m, params.Bz, vy), ay(params.q, params.m, params.Bz, vx)]
+        let a = Math.sqrt(Ax * Ax + Ay * Ay)
+        let v = Math.sqrt(vx * vx + vy + vy)
+        let R = v * v / a;
 
-            Positions[0].push(x + vx * dt);
-            Positions[1].push(y + vy * dt);
-            Positions[2].push(z + vz * dt);
 
-            let vx_copy = vx;
-            let vy_copy = vy;
-            vx += ax(params.q, params.m, params.Bz, vy_copy) * dt;
-            vy += ay(params.q, params.m, params.Bz, vx_copy) * dt;
-            vz += 0;
+        let dt = 0.05;
+        for (let i = 1; i < params.n; i += 1) {
+            Positions[0].push(R * Math.sin(dt * i))
+            Positions[1].push(R * Math.cos(dt * i))
+            Positions[2].push(vz * dt * i)
+            console.log(Positions[0], Positions[1], Positions[2])
         }
 
         return [Positions[0], Positions[1], Positions[2]]
@@ -120,7 +119,7 @@
         {name: "B", min: -10, max: 10, value: 1, step: 0.1},
         {name: "q", min: -10, max: 10, value: 1, step: 0.1},
         {name: "m", min: 0.1, max: 10, value: 0.1, step: 0.1},
-        {name: "n", min: 0, max: 10000, value: 2000, step: 100},
+        {name: "n", min: 0, max: 500, value: 300, step: 10},
     ]
     const generateSliders = (data) => {
         let sliders = '<div id="all_sliders">';
