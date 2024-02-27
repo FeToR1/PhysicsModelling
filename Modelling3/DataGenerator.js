@@ -1,4 +1,5 @@
 const nu0 = 1.2566370614
+
 function Distance(x1, y1, x2, y2) {
     return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
 }
@@ -7,7 +8,8 @@ function angle(x1, y1, x2, y2) {
     return Math.atan2(y2 - y1, x2 - x1)
 }
 
-function makeArrow(x, y, angle, length) {
+function makeArrow(x, y, angle, length, color = 'black') {
+    console.log(color)
     return {
         xref: 'x',
         x: x + length * Math.cos(angle),
@@ -21,10 +23,31 @@ function makeArrow(x, y, angle, length) {
         ayref: 'y',
         ay: y,
 
+        arrowcolor: color,
     }
 
 }
 
+
+function perc2color(perc, min, max) {
+    const base = (max - min);
+
+    if (base === 0) {
+        perc = 0;
+    } else {
+        perc = (perc - min) / base * 100;
+    }
+    let r, g, b = 0;
+    if (perc < 50) {
+        r = 255;
+        g = Math.round(5.1 * perc);
+    } else {
+        g = 255;
+        r = Math.round(510 - 5.10 * perc);
+    }
+    const h = r * 0x10000 + g * 0x100 + b * 0x1;
+    return '#' + ('000000' + h.toString(16)).slice(-6);
+}
 
 function CalcB(p) {
     let pos = []
@@ -73,13 +96,27 @@ export function DrawChart(p) {
         annotations: [],
     };
 
+
+    let maxB = Math.max(...posB.map(x => {
+        if (isNaN(x[3])) {
+            return 0
+        }
+        return x[3]
+    }))
+    let minB = Math.min(...posB.map(x => {
+        if (isNaN(x[3])) {
+            return 0
+        }
+        return x[3]
+    }))
+
     for (let i = 0; i < posB.length; i++) {
         let [x, y, angle, B] = posB[i]
         if (isNaN(angle)) {
             continue
         }
-        
-        layout.annotations.push(makeArrow(x, y, angle, 5))
+
+        layout.annotations.push(makeArrow(x, y, angle, 5, perc2color(B, minB, maxB)))
     }
 
     Plotly.newPlot('chart-container', data, layout);
