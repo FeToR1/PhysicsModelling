@@ -1,21 +1,22 @@
 function GenerateData(p) {
-    let Positions = [[], [], [], []]
+    let Positions = [[], [], [], [], []]
 
     const ampl = Number(p.Amplitude)
-    const df = Number(p.DeltaFrequency * 1e-3) // мГц
+    const df = Number(p.DeltaFrequency)
     const f1 = Number(p.Frequency)
     const f2 = f1 + df
 
-    console.log(f1, f2, df)
     const w1 = 2 * Math.PI * f1
     const w2 = 2 * Math.PI * f2
-    const dw = 2 * Math.PI * p.DeltaFrequency
+    const dw = w1 - w2
 
     const [num, delim] = [10000, 500000]
     Positions[0] = Array.from({ length: num }, (_, i) => i / delim)
     Positions[1] = Positions[0].map(x => ampl * Math.cos(w1 * x))
     Positions[2] = Positions[0].map(x => ampl * Math.cos(w2 * x))
     Positions[3] = Positions[0].map(x => 2 * ampl * Math.cos(w1 * x) * Math.cos(dw * x))
+    Positions[4] = Positions[0].map(x => 2 * ampl * Math.cos(dw  * x))
+
 
     return Positions
 }
@@ -55,6 +56,17 @@ export function DrawChart(p) {
                 width: 2
             },
             color: 'blue'
+        },
+        {
+            x: elements[0],
+            y: elements[4],
+            type: 'scatter',
+            mode: 'lines',
+            name: 'Амплитуда биения',
+            line: {
+                width: 2
+            },
+            color: 'green'
         }
     ];
 
