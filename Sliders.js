@@ -1,7 +1,8 @@
 function TemplateSlider(item) {
+    const name = item.fullname ? item.fullname : item.name;
     return `
                 <div class="slider-container">
-                    <label for="paramSlider">Параметр ${item.name}:</label>
+                    <label for="paramSlider">${name}</label>
                     <input type="range" name="${item.name}" min="${item.min}" max="${item.max}" value="${item.value}" class="slider" step="${item.step}">
                     <p>Значение: <span id="param_${item.name}">${item.value}</span> ${item.unit}</p>
                 </div>
