@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelling 7</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js'></script>
+    <style>
+        #chart-container {
+            width: 100%;
+        }
+
+        #chart-container2 {
+            width: 100%;
+        }
+
+        #all_sliders {
+            display: flex;
+            flex-direction: column;
+            margin-top: 5%;
+
+        }
+
+        .slider-container {
+            width: 30%;
+        }
+
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div id="chart-container"></div>
+    <div id="chart-container2"></div>
+</div>
+
+<script type="module">
+    import {generateSliders, ChangeHTML} from "../Sliders.js"
+    import {debounce, getValues} from "../Utils.js"
+    import {DrawChart} from "./DataGenerator.js"
+
+
+    const data = [
+        {fullname: "Длина волны", name: "lambda", unit: "нм", min: 400, max: 700, value: 539, step: 1},
+        {fullname: "Коэффициент преломления 1", name: "n1", unit: "", min: 1, max: 2, value: 1.28, step: 0.01},
+        {fullname: "Коэффициент преломления 2", name: "n2", unit: "", min: 1, max: 2, value: 1.35, step: 0.01},
+        {fullname: "Расстояние между щелями", name: "d", unit: "мкм", min: 1, max: 100, value: 23, step: 1},
+        {fullname: "Расстояние до экрана", name: "L", unit: "м", min: 22, max: 100, value: 40, step: 1},
+    ]
+
+    document.body.querySelector('.wrapper').innerHTML = generateSliders(data) + document.body.querySelector('.wrapper').innerHTML;
+    DrawChart(getValues(data));
+
+    let sliders = document.querySelectorAll('.slider');
+
+    const debounceDrawChart = debounce(DrawChart, 400);
+
+    sliders.forEach((slider) => {
+        slider.addEventListener('input', (event) => {
+            ChangeHTML(event.target.name, event.target.value);
+            debounceDrawChart(getValues(data));
+        });
+    });
+
+
+</script>
+
+
+</body>
+</html>
