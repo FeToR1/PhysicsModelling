@@ -1,14 +1,14 @@
 function GenerateData(p) {
-    let {lambda, n1, n2, d, L} = p
+    let {lambda, n, d, L} = p
     lambda *= 1e-9
     d *= 1e-6
     // console.log()
 
-    let Positions = [[], [], L / d * lambda / n1 * n2]
+    let Positions = [[], [], L / d * lambda / n]
     const [num, delim] = [1000, 1000]
 
     Positions[0] = Array.from({length: num}, (_, i) => i / delim)
-    Positions[1] = Positions[0].map(x => Math.cos(n1 / n2 * d * x * Math.PI / lambda / L) ** 2 * 255) // Интенсивность
+    Positions[1] = Positions[0].map(x => Math.cos(n * d * x * Math.PI / lambda / L) ** 2 * 255) // Интенсивность
 
     return Positions
 }
@@ -30,7 +30,7 @@ export function DrawChart(p) {
         title: 'Интерферреционные полосы',
         xaxis: {
             range: [0, elements[0].length],
-            tickvals: Array.from({length: 11}, (_, i) => i * elements[2] * 500),
+            tickvals: Array.from({length: 1 + elements[0].length / elements[2] / 500}, (_, i) => i * elements[2] * 500),
             // showticklabels: false
             title: '1/500 м'
         },
