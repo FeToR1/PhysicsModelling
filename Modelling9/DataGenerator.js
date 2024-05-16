@@ -4,7 +4,7 @@ function GenerateData(p) {
     d *= 1e-6
     // console.log()
 
-    let Positions = [[], [], L/d * lambda]
+    let Positions = [[], [], L / d * lambda / n1 * n2]
     const [num, delim] = [1000, 1000]
 
     Positions[0] = Array.from({length: num}, (_, i) => i / delim)
@@ -30,12 +30,14 @@ export function DrawChart(p) {
         title: 'Интерферреционные полосы',
         xaxis: {
             range: [0, elements[0].length],
-            // tickvals:
-            showticklabels: false
+            tickvals: Array.from({length: 11}, (_, i) => i * elements[2] * 500),
+            // showticklabels: false
+            title: '1/500 м'
         },
         yaxis: {
             range: [0, 10],
-            showticklabels: false
+            // showticklabels: false
+            title: "м"
         },
         width: 1500,
         height: 500,
