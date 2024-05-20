@@ -47,10 +47,10 @@
 
 
     const data = [
-        {fullname: "Частота несущего колебания", name: "Fn", unit: "Гц", min: 1, max: 1500, value: 200, step: 1},
-        {fullname: "Амплитуда несущего колебания", name: "An", unit: "мм", min: 0, max: 100, value: 10, step: 1},
-        {fullname: "Частота модулирующего колебания", name: "Fm", unit: "Гц", min: 1, max: 1500, value: 1000, step: 1},
-        {fullname: "Амплитуда модулирующего колебания", name: "Am", unit: "мм", min: 0, max: 100, value: 20, step: 1},
+        {fullname: "Частота несущего колебания", name: "Fn", unit: "Гц", min: 1, max: 30, value: 10, step: 1},
+        {fullname: "Амплитуда несущего колебания", name: "An", unit: "мм", min: 0, max: 100, value: 5, step: 1},
+        {fullname: "Частота модулирующего колебания", name: "Fm", unit: "Гц", min: 1, max: 30, value: 1, step: 1},
+        {fullname: "Амплитуда модулирующего колебания", name: "Am", unit: "мм", min: 0, max: 100, value: 7, step: 1},
     ]
 
     document.body.querySelector('.wrapper').innerHTML = generateSliders(data) + document.body.querySelector('.wrapper').innerHTML;
