@@ -1,26 +1,55 @@
 function fourierTransform(signal) {
-    return signal.map((_, k, arr) => {
-        let [re, im] = arr.reduce(([accRe, accIm], val, n) => {
-            let phi = -2 * Math.PI * k * n / arr.length;
-            return [accRe + val * Math.cos(phi), accIm + val * Math.sin(phi)];
-        }, [0, 0]);
-        return Math.hypot(re, im);
-    });
+    const N = signal.length;
+    const result = new Array(N).fill([0, 0]);
+
+    for (let k = 0; k < N; k++) {
+        let sumRe = 0;
+        let sumIm = 0;
+
+        for (let n = 0; n < N; n++) {
+            let phi = -2 * Math.PI * k * n / N;
+            sumRe += signal[n] * Math.cos(phi);
+            sumIm += signal[n] * Math.sin(phi);
+        }
+
+        result[k] = [sumRe, sumIm];
+    }
+
+    return result.map(([re, im]) => Math.hypot(re, im));
 }
+
 function GenerateData(p) {
-    let Positions = [[], [], [], [], [], [], []]
+    let Positions = [[], [], [], [], [], [], [], []]
     let { Fn, An, Fm, Am } = p
-    let K = An/Am // Коэффициент модуляции
+    Fn = Number(Fn)
+    An = Number(An)
+    Fm = Number(Fm)
+    Am = Number(Am)
 
-    const [num, delim] = [1000, 10000]
-    Positions[0] = Array.from({ length: num }, (_, i) => i / delim)
-    Positions[1] = Positions[0].map(x => An * Math.cos(Fn * x)) // Волна несущая
-    Positions[2] = Positions[0].map(x => Am * Math.cos(Fm * x)) // Волна информационная
-    Positions[3] = Positions[0].map(x => (1 + K * Math.cos(Fm * x)) * An * Math.cos(Fn * x)) // Результат модуляции
+    const [num, delim] = [5000, 0.001]
+    Positions[0] = Array.from({ length: num }, (_, i) => i * delim)
+    Positions[1] = Positions[0].map(x =>  An * Math.sin(2 * Math.PI * Fn * x)) // Волна несущая
+    Positions[2] = Positions[0].map(x => Am * Math.cos(2 * Math.PI * Fm * x)) // Волна информационная
+    Positions[3] = Positions[0].map(x =>
+        An * Math.sin(2 * Math.PI * Fn * x) + 0.5 * Am * (
+            Math.sin(2 * Math.PI * (Fn + Fm) * x) +
+            Math.sin(2 * Math.PI * (Fn - Fm) * x)
+        )
+    ) // Результат модуляции
 
-    Positions[4] = fourierTransform(Positions[1])
-    Positions[5] = fourierTransform(Positions[2])
-    Positions[6] = fourierTransform(Positions[3])
+    const part = 0.015
+
+    Positions[4] = fourierTransform(Positions[1]).slice(0, num * part)
+
+    let max = Positions[4].reduce((acc, val) => val > acc ? val : acc, 0)
+    let max_ind = Positions[4].reduce((acc, val, ind) => val === max ? ind : acc, 0)
+    const Fn1 =  2 * Math.PI * Fm / max_ind
+
+    Positions[4] = Positions[4].map(x => x / max * An)
+    Positions[5] = fourierTransform(Positions[2]).slice(0, num * part).map(x => x / max * Am)
+    Positions[6] = fourierTransform(Positions[3]).slice(0, num * part).map(x => x / max * Am)
+
+    Positions[7] = Array.from({ length: num * part }, (_, i) => i * Fn1 * 10)
 
     return Positions
 }
@@ -61,9 +90,11 @@ export function DrawChart(p) {
         },
     ];
 
+
+
     let data2 = [
         {
-            x: elements[0],
+            x: elements[7],
             y: elements[4],
             type: 'scatter',
             mode: 'lines',
@@ -73,7 +104,7 @@ export function DrawChart(p) {
             },
         },
         {
-            x: elements[0],
+            x: elements[7],
             y: elements[5],
             type: 'scatter',
             mode: 'lines',
@@ -83,7 +114,7 @@ export function DrawChart(p) {
             },
         },
         {
-            x: elements[0],
+            x: elements[7],
             y: elements[6],
             type: 'scatter',
             mode: 'lines',
@@ -112,7 +143,7 @@ export function DrawChart(p) {
             xanchor: 'left',
             y: 0,
             yanchor: 'top',
-            text: 't, с',
+            text: 'циклическая частота, рад/с',
             showarrow: false
         }]
     };
