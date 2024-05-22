@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelling 11</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js'></script>
+    <style>
+        #chart-container {
+            width: 100%;
+        }
+
+        #all_sliders {
+            display: flex;
+            flex-direction: column;
+            margin-top: 5%;
+
+        }
+
+        .slider-container {
+            width: 30%;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: space-around;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div id="chart-container"></div>
+</div>
+
+<script type="module">
+    import {generateSliders, ChangeHTML} from "../Sliders.js"
+    import {debounce, getValues} from "../Utils.js"
+    import {DrawChart} from "./DataGenerator.js"
+
+
+    const data = [
+        {fullname: "Количество щелей", name: "N", unit: "", min: 1, max: 15, value: 2, step: 1},
+        {fullname: "Размер щели", name: "a", unit: "мм", min: 1, max: 10, value: 1.2, step: 0.1},
+        {fullname: "Длина волны", name: "lambda", unit: "нм", min: 400, max: 700, value: 539, step: 1},
+        {fullname: "Период решётки", name: "d", unit: "мм", min: 1, max: 10, value: 7.5, step: 0.1},
+        {fullname: "Угол наблюдения", name: "theta", unit: "рад", min: 0.0001, max: 0.01, value: 0.001, step: 0.0001},
+    ]
+    document.body.querySelector('.wrapper').innerHTML = generateSliders(data) + document.body.querySelector('.wrapper').innerHTML;
+    DrawChart(getValues(data));
+
+    let sliders = document.querySelectorAll('.slider');
+
+    const debounceDrawChart = debounce(DrawChart, 400);
+
+    sliders.forEach((slider) => {
+        slider.addEventListener('input', (event) => {
+            ChangeHTML(event.target.name, event.target.value);
+            debounceDrawChart(getValues(data));
+        });
+    });
+
+
+</script>
+
+
+</body>
+</html>
