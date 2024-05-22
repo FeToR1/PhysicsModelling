@@ -53,7 +53,7 @@ export function DrawChart(p) {
             xanchor: 'left',
             y: 0,
             yanchor: 'top',
-            text: 'θ',
+            text: 'θ, рад',
             showarrow: false
         }]
     };
